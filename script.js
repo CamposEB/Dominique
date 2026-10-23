@@ -42,13 +42,12 @@ function escapeHtml(str) {
 function escapeAttr(str) { return escapeHtml(str).replace(/\n/g, ' '); }
 
 function placeholderSVG(name, category) {
-  // Cores claras (areia/creme) — sem chocolate/marrom escuro de fundo
+  // Cores claras (areia/creme)
   const palette = {
-    feminina: ['#F2EBE2', '#D9C3A5'],
-    retro:    ['#E8D4B8', '#C7A17A'],
-    infantil: ['#F5EDE4', '#DBC3A5'],
+    meninas: ['#F2EBE2', '#D9C3A5'],
+    meninos: ['#E8D4B8', '#C7A17A'],
   };
-  const [c1, c2] = palette[category] || palette.feminina;
+  const [c1, c2] = palette[category] || palette.meninas;
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 750'>
     <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
       <stop offset='0' stop-color='${c1}'/><stop offset='1' stop-color='${c2}'/>
@@ -63,15 +62,8 @@ function placeholderSVG(name, category) {
 }
 
 const PRODUCTS_FALLBACK = [
-  { id: 'fem-001', name: 'Item 1', category: 'feminina', price: 'R$ 219,90', sizes: ['P','M','G','GG'], badge: 'Novo',        image: '', alt: 'Item 1 da coleção Dominique Modas' },
-  { id: 'fem-002', name: 'Item 2', category: 'feminina', price: 'R$ 129,90', sizes: ['P','M','G'],      badge: '',            image: '', alt: 'Item 2 da coleção Dominique Modas' },
-  { id: 'fem-003', name: 'Item 3', category: 'feminina', price: 'R$ 289,90', sizes: ['P','M','G','GG'], badge: '',            image: '', alt: 'Item 3 da coleção Dominique Modas' },
-  { id: 'ret-001', name: 'Item 4', category: 'retro',    price: 'R$ 239,90', sizes: ['P','M','G'],      badge: 'Best-seller', image: '', alt: 'Item 4 da coleção Dominique Modas' },
-  { id: 'ret-002', name: 'Item 5', category: 'retro',    price: 'R$ 149,90', sizes: ['P','M','G'],      badge: '',            image: '', alt: 'Item 5 da coleção Dominique Modas' },
-  { id: 'ret-003', name: 'Item 6', category: 'retro',    price: 'R$ 189,90', sizes: ['P','M','G'],      badge: '',            image: '', alt: 'Item 6 da coleção Dominique Modas' },
-  { id: 'inf-001', name: 'Item 7', category: 'infantil', price: 'R$ 179,90', sizes: ['2','4','6','8'],  badge: 'Novo',        image: '', alt: 'Item 7 da coleção Dominique Modas' },
-  { id: 'inf-002', name: 'Item 8', category: 'infantil', price: 'R$ 119,90', sizes: ['2','4','6','8','10'], badge: '',         image: '', alt: 'Item 8 da coleção Dominique Modas' },
-  { id: 'inf-003', name: 'Item 9', category: 'infantil', price: 'R$ 99,90',  sizes: ['2','4','6'],      badge: '',            image: '', alt: 'Item 9 da coleção Dominique Modas' },
+  { id: 'F-001', name: 'Item 1', category: 'meninas', price: 'R$ 100,00', sizes: [], badge: 'Novo', image: '', alt: 'Item 1' },
+  { id: 'M-001', name: 'Item 2', category: 'meninos', price: 'R$ 100,00', sizes: [], badge: '', image: '', alt: 'Item 2' },
 ];
 
 const state = {
@@ -115,7 +107,7 @@ function applyWhatsAppLinks(scope = document) {
 }
 
 /* ============================================================
-   3. HEADER + PROGRESSO (com rAF simples, sem hijack)
+   3. HEADER + PROGRESSO
    ============================================================ */
 function initHeader() {
   const header = $('.header');
@@ -129,7 +121,6 @@ function initHeader() {
       const doc = document.documentElement;
       const total = doc.scrollHeight - doc.clientHeight;
       const pct = total > 0 ? Math.min(1, y / total) : 0;
-      // transform (GPU) em vez de width (layout)
       progress.style.transform = `scaleX(${pct})`;
     }
     ticking = false;
@@ -147,7 +138,7 @@ function initHeader() {
 }
 
 /* ============================================================
-   4. MENU MOBILE (animação agora é CSS)
+   4. MENU MOBILE
    ============================================================ */
 function initMenu() {
   const toggle = $('.menu-toggle');
@@ -202,11 +193,9 @@ function initScrollspy() {
 
 /* ============================================================
    6. REVELAÇÃO AO ROLAR
-   Reduzido: só os cabeçalhos de seção e o sobre/contato
-   (antes eram 35 elementos; agora ~10).
    ============================================================ */
 function initReveal() {
-  const els = $$('.section-head.reveal, .about__media.reveal, .about__text.reveal, .contact__text.reveal, .contact__list.reveal');
+  const els = $$('.section-head.reveal, .contact__text.reveal, .contact__list.reveal');
   if (!els.length) return;
   if (prefersReducedMotion || isLowPower()) {
     els.forEach((el) => el.classList.add('is-visible'));
@@ -227,43 +216,14 @@ function initReveal() {
 }
 
 /* ============================================================
-   7. CURSOR CUSTOMIZADO (opt-in: só desktop com hardware bom)
+   7. CURSOR CUSTOMIZADO (desativado por padrão)
    ============================================================ */
 function initCursor() {
   return; // cursor customizado desativado
-  if (isLowPower() || isTouch() || prefersReducedMotion) return;
-  const cursor = $('#cursor');
-  if (!cursor) return;
-  const label = $('.cursor__label', cursor);
-
-  let mx = window.innerWidth / 2, my = window.innerHeight / 2;
-  let cx = mx, cy = my;
-  let rafId = null;
-
-  document.addEventListener('mousemove', (e) => {
-    mx = e.clientX; my = e.clientY;
-    if (rafId === null) rafId = requestAnimationFrame(loop);
-  }, { passive: true });
-
-  function loop() {
-    cx += (mx - cx) * 0.22;
-    cy += (my - cy) * 0.22;
-    cursor.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
-    rafId = null;
-  }
-
-  document.addEventListener('mouseover', (e) => {
-    const t = e.target.closest('a, button, .product, .cat-card, .look');
-    if (!t) { cursor.classList.remove('is-hover', 'is-wa'); if (label) label.textContent = ''; return; }
-    cursor.classList.add('is-hover');
-    const isWa = t.matches('a') && t.href && t.href.includes('wa.me');
-    cursor.classList.toggle('is-wa', isWa);
-    if (label) label.textContent = isWa ? 'WhatsApp' : (t.classList.contains('product') ? 'Ver' : '');
-  }, { passive: true });
 }
 
 /* ============================================================
-   8. BOTÕES MAGNÉTICOS (opt-in: desktop bom, com rAF)
+   8. BOTÕES MAGNÉTICOS
    ============================================================ */
 function initMagnetic() {
   if (isLowPower() || isTouch() || prefersReducedMotion) return;
@@ -312,8 +272,16 @@ function saveFavorites() {
 }
 
 function buildProductMessage(p) {
-  const sizes = p.sizes && p.sizes.length ? ` — tamanhos ${p.sizes.join(', ')}` : '';
-  return `Olá! Vi no site da Dominique Modas a peça "${p.name}" (${p.price}${sizes}) e gostaria de saber mais sobre disponibilidade.`;
+  let msg = `Olá! Vi no site da Dominique Modas a peça "${p.name}" (${p.price})`;
+  
+  if (p.sizes && p.sizes.length > 0) {
+    msg += ` — tamanhos ${p.sizes.join(', ')}`;
+  } else {
+    msg += ` — e gostaria de consultar os tamanhos disponíveis`;
+  }
+  
+  msg += ` e saber mais sobre disponibilidade.`;
+  return msg;
 }
 
 function renderProducts() {
@@ -494,7 +462,7 @@ function openQuickView(id) {
         <img src="${img}" alt="${escapeAttr(product.alt || product.name)}" width="600" height="750" ${onerr ? `onerror="${onerr}"` : ''}>
       </div>
       <div class="qv__info">
-        <p class="qv__cat">${escapeHtml({feminina:'Feminina', retro:'Retrô', infantil:'Infantil'}[product.category] || '')}</p>
+        <p class="qv__cat">${escapeHtml({meninas:'Meninas', meninos:'Meninos'}[product.category] || '')}</p>
         <h2 class="qv__name" id="qv-name">${escapeHtml(product.name)}</h2>
         <p class="qv__price">${escapeHtml(product.price)}</p>
         ${product.description ? `<p class="qv__desc">${escapeHtml(product.description)}</p>` : ''}
@@ -514,6 +482,7 @@ function openQuickView(id) {
 
   let selSize = sizes[0] || '';
   let selColor = colors[0]?.name || '';
+  
   $$('[data-qv-size]', body).forEach((c) => {
     c.addEventListener('click', () => {
       $$('[data-qv-size]', body).forEach((x) => { x.classList.remove('is-active'); x.setAttribute('aria-pressed', 'false'); });
@@ -522,6 +491,7 @@ function openQuickView(id) {
       updateQvMessage(body, product, selSize, selColor);
     });
   });
+  
   $$('[data-qv-color]', body).forEach((c) => {
     c.addEventListener('click', () => {
       $$('[data-qv-color]', body).forEach((x) => { x.classList.remove('is-active'); x.setAttribute('aria-pressed', 'false'); });
@@ -539,7 +509,12 @@ function updateQvMessage(body, product, size, color) {
   let msg = `Olá! Vi no site da Dominique Modas a peça "${product.name}" (${product.price})`;
   if (size) msg += ` — tamanho ${size}`;
   if (color) msg += ` · cor ${color}`;
-  msg += ' e gostaria de saber mais sobre disponibilidade.';
+  
+  if (!size && product.sizes && product.sizes.length === 0) {
+    msg += ` — e gostaria de consultar os tamanhos disponíveis`;
+  }
+  
+  msg += ' e saber mais sobre disponibilidade.';
   const cta = $('.qv__cta', body);
   if (cta) {
     cta.dataset.waMensagem = msg;
@@ -556,7 +531,15 @@ function updateFavCount() {
 }
 
 function buildFavoritesMessage(favs) {
-  const lines = favs.map((p, i) => `${i + 1}. ${p.name} (${p.price}) — tam. ${(p.sizes || []).join(', ')}`);
+  const lines = favs.map((p, i) => {
+    let line = `${i + 1}. ${p.name} (${p.price})`;
+    if (p.sizes && p.sizes.length > 0) {
+      line += ` — tam. ${p.sizes.join(', ')}`;
+    } else {
+      line += ` — (consultar tamanho)`;
+    }
+    return line;
+  });
   return `Olá! Separei algumas peças favoritas na Dominique Modas:\n\n${lines.join('\n')}\n\nPoderia me ajudar com disponibilidade?`;
 }
 
@@ -574,15 +557,17 @@ function initFavorites() {
     } else {
       body.innerHTML = `
         <ul class="fav-list">
-          ${favs.map((p) => `
+          ${favs.map((p) => {
+            const sizeStr = (p.sizes && p.sizes.length > 0) ? p.sizes.join(', ') : 'Consultar';
+            return `
             <li class="fav-item">
               <div class="fav-item__info">
                 <strong>${escapeHtml(p.name)}</strong>
-                <span>${escapeHtml(p.price)} · Tam. ${escapeHtml((p.sizes||[]).join(', '))}</span>
+                <span>${escapeHtml(p.price)} · Tam. ${escapeHtml(sizeStr)}</span>
               </div>
               <button class="fav-item__remove" type="button" data-remove="${escapeAttr(p.id)}" aria-label="Remover ${escapeAttr(p.name)} dos favoritos">×</button>
             </li>
-          `).join('')}
+          `}).join('')}
         </ul>
         <a class="btn btn--primary btn--lg" href="https://wa.me/${CONFIG.whatsapp.numero}"
            data-wa data-wa-mensagem="${escapeAttr(buildFavoritesMessage(favs))}"
@@ -631,7 +616,7 @@ function initMarquee() {
 }
 
 /* ============================================================
-   15. DRAG SCROLL (lookbook / depoimentos desktop)
+   15. DRAG SCROLL (opcional para listas horizontais)
    ============================================================ */
 function initDragScroll() {
   $$('.lookbook__track, .testimonials__track').forEach((el) => {
