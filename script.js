@@ -14,7 +14,7 @@
 
 const CONFIG = {
   whatsapp: {
-    numero: '5521989512181',
+    numero: '5521995512261', // Número corrigido aqui
     mensagemPadrao: 'Olá! Vi o site da Dominique Modas e gostaria de saber mais.',
   },
 };
