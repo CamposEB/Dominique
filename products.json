@@ -1,0 +1,15 @@
+{
+  "updated": "2026-10-22",
+  "note": "Produtos renomeados para Item 1, Item 2, etc. Substitua por nomes reais quando os produtos chegarem. colors é opcional.",
+  "products": [
+    { "id": "fem-001", "name": "Item 1", "category": "feminina", "price": "R$ 219,90", "sizes": ["P","M","G","GG"], "badge": "Novo", "image": "", "alt": "Item 1 da coleção Dominique Modas", "colors": [{"name":"Areia","hex":"#D9C3A5"},{"name":"Terracota","hex":"#7B3F3A"}] },
+    { "id": "fem-002", "name": "Item 2", "category": "feminina", "price": "R$ 129,90", "sizes": ["P","M","G"], "badge": "", "image": "", "alt": "Item 2 da coleção Dominique Modas" },
+    { "id": "fem-003", "name": "Item 3", "category": "feminina", "price": "R$ 289,90", "sizes": ["P","M","G","GG"], "badge": "", "image": "", "alt": "Item 3 da coleção Dominique Modas" },
+    { "id": "ret-001", "name": "Item 4", "category": "retro", "price": "R$ 239,90", "sizes": ["P","M","G"], "badge": "Best-seller", "image": "", "alt": "Item 4 da coleção Dominique Modas" },
+    { "id": "ret-002", "name": "Item 5", "category": "retro", "price": "R$ 149,90", "sizes": ["P","M","G"], "badge": "", "image": "", "alt": "Item 5 da coleção Dominique Modas" },
+    { "id": "ret-003", "name": "Item 6", "category": "retro", "price": "R$ 189,90", "sizes": ["P","M","G"], "badge": "", "image": "", "alt": "Item 6 da coleção Dominique Modas" },
+    { "id": "inf-001", "name": "Item 7", "category": "infantil", "price": "R$ 179,90", "sizes": ["2","4","6","8"], "badge": "Novo", "image": "", "alt": "Item 7 da coleção Dominique Modas" },
+    { "id": "inf-002", "name": "Item 8", "category": "infantil", "price": "R$ 119,90", "sizes": ["2","4","6","8","10"], "badge": "", "image": "", "alt": "Item 8 da coleção Dominique Modas" },
+    { "id": "inf-003", "name": "Item 9", "category": "infantil", "price": "R$ 99,90", "sizes": ["2","4","6"], "badge": "", "image": "", "alt": "Item 9 da coleção Dominique Modas" }
+  ]
+}

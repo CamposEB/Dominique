@@ -1,0 +1,209 @@
+/* ============================================================
+   PERFORMANCE.CSS — overrides para eliminar lag
+   Carregar DEPOIS de style.css:
+   <link rel="stylesheet" href="performance.css">
+   ------------------------------------------------------------
+   Nada aqui muda a identidade visual (paleta, tipografia, layout).
+   Só remove o que trava a GPU/CPU do celular.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. Remove will-change de todos os .reveal
+   Cada will-change aloca uma camada GPU. Tínhamos 35+.
+   ------------------------------------------------------------ */
+.js .reveal {
+  will-change: auto;
+}
+
+/* ------------------------------------------------------------
+   2. Remove backdrop-filter dos cards, filtros e modais
+   Cada backdrop-filter força leitura de framebuffer.
+   20+ elementos = GPU no limite, principalmente no celular.
+   Header mantém blur leve só em desktop (abaixo).
+   ------------------------------------------------------------ */
+.product,
+.cat-card,
+.step,
+.testimonial,
+.look,
+.filters,
+.contact__list li,
+.values li,
+.fav-item,
+.modal,
+.local-card {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: 0 6px 20px -12px rgba(42, 26, 24, 0.15);
+}
+[data-theme="dark"] .product,
+[data-theme="dark"] .cat-card,
+[data-theme="dark"] .step,
+[data-theme="dark"] .testimonial,
+[data-theme="dark"] .look,
+[data-theme="dark"] .filters,
+[data-theme="dark"] .contact__list li,
+[data-theme="dark"] .values li,
+[data-theme="dark"] .fav-item,
+[data-theme="dark"] .modal,
+[data-theme="dark"] .local-card {
+  box-shadow: 0 6px 20px -12px rgba(0, 0, 0, 0.4);
+}
+
+/* Header: só desktop tem blur, e mais leve */
+.header--scrolled {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+@media (max-width: 767px) {
+  .header,
+  .header--scrolled {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--creme);
+  }
+  [data-theme="dark"] .header,
+  [data-theme="dark"] .header--scrolled {
+    background: var(--creme);
+  }
+}
+
+/* ------------------------------------------------------------
+   3. Hero: remove filter blur do halo (caro em GPU mobile)
+   Substituído por gradiente direto (mesma aparência).
+   Fallback: sem animação de mesh (background fixo).
+   ------------------------------------------------------------ */
+.hero__halo {
+  filter: none;
+  background: radial-gradient(closest-side, rgba(236, 210, 154, 0.22), transparent 70%);
+}
+.no-silk .hero__fallback {
+  animation: none;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(217, 195, 165, 0.85) 0%, transparent 50%),
+    radial-gradient(circle at 75% 70%, rgba(123, 63, 58, 0.75) 0%, transparent 55%),
+    radial-gradient(circle at 50% 90%, rgba(250, 246, 241, 0.9) 0%, transparent 60%),
+    linear-gradient(135deg, #FAF6F1 0%, #D9C3A5 50%, #7B3F3A 100%);
+  background-size: 100% 100%;
+}
+
+/* ------------------------------------------------------------
+   4. Tilt 3D: remove JS tilt (o CSS abaixo é só sombra + translateY)
+   transform-style: preserve-3d + perspective + JS mousemove
+   era um dos maiores custos. Sombra leve + translateY dá a
+   mesma sensação de profundidade.
+   ------------------------------------------------------------ */
+.tilt {
+  transform-style: flat !important;
+  transform: none !important;
+}
+@media (hover: hover) and (pointer: fine) and (min-width: 900px) {
+  .product.tilt:hover,
+  .cat-card.tilt:hover {
+    transform: translateY(-3px) !important;
+  }
+}
+.product::after,
+.cat-card::after {
+  display: none; /* brilho especular com mix-blend-mode: soft-light removido */
+}
+.product__price,
+.product__badge {
+  transform: none !important; /* translateZ não faz sentido sem preserve-3d */
+}
+
+/* ------------------------------------------------------------
+   5. Progresso: usa transform (GPU) em vez de width (layout)
+   ------------------------------------------------------------ */
+.progress {
+  width: 100% !important;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  will-change: transform;
+  transition: none !important;
+}
+
+/* Cursor customizado: só aparece onde JS o ativa (desktop bom) */
+@media (hover: none), (max-width: 899px) {
+  .cursor { display: none !important; }
+}
+
+/* ------------------------------------------------------------
+   6. Marquee: animação em transform (já estava), 50s
+   ------------------------------------------------------------ */
+.marquee__track {
+  will-change: transform;
+  animation-duration: 50s;
+}
+
+/* ------------------------------------------------------------
+   7. Seções abaixo da dobra: content-visibility: auto
+   Browser pula layout/paint de seções fora da viewport.
+   Ganho enorme no primeiro scroll em mobile.
+   ------------------------------------------------------------ */
+.categories,
+.lookbook,
+.about,
+.how,
+.testimonials,
+.insta,
+.contact,
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 800px;
+}
+
+/* ------------------------------------------------------------
+   8. Cards e listas: isola renderização
+   ------------------------------------------------------------ */
+.product,
+.cat-card,
+.step,
+.testimonial,
+.look {
+  contain: layout style paint;
+}
+
+/* ------------------------------------------------------------
+   9. Transições mais curtas (era 0.35s → 0.2s)
+   Menos frames intermediários = menos GPU
+   ------------------------------------------------------------ */
+.product,
+.cat-card,
+.step,
+.testimonial,
+.look,
+.btn {
+  transition-duration: 0.2s;
+}
+
+/* ------------------------------------------------------------
+   10. Menu mobile: animação em CSS puro
+   GSAP saiu; esta é a substituição, em cascata.
+   ------------------------------------------------------------ */
+.nav.is-open .nav__list li,
+.nav.is-open .nav__cta {
+  animation: navIn 0.35s ease-out both;
+}
+.nav.is-open .nav__list li:nth-child(1) { animation-delay: 0.04s; }
+.nav.is-open .nav__list li:nth-child(2) { animation-delay: 0.08s; }
+.nav.is-open .nav__list li:nth-child(3) { animation-delay: 0.12s; }
+.nav.is-open .nav__list li:nth-child(4) { animation-delay: 0.16s; }
+.nav.is-open .nav__list li:nth-child(5) { animation-delay: 0.20s; }
+.nav.is-open .nav__cta { animation-delay: 0.26s; }
+@keyframes navIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ------------------------------------------------------------
+   11. Reduced motion: reforço
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track { animation: none; }
+  .progress { transition: none; }
+  .nav.is-open .nav__list li,
+  .nav.is-open .nav__cta { animation: none; }
+  .product.tilt:hover,
+  .cat-card.tilt:hover { transform: none !important; }
+}
